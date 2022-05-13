@@ -1,3 +1,4 @@
+//Simple ALU module
 module alu #(
 	parameter WORD_SIZE = 32
 ) (
@@ -18,6 +19,6 @@ module alu #(
 		end
 	end
 
-	assign zero = (result=='0);
+	assign zero = (result == '0);
 
 endmodule : alu
