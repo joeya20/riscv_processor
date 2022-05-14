@@ -5,6 +5,6 @@ package riscv_pkg;
 		OR 	= 4'b0001,
 		ADD = 4'b0010,
 		SUB = 4'b0110
-	 } alu_op_t;
+	} alu_op_t;
 
 endpackage : riscv_pkg

@@ -1,18 +1,25 @@
 //top level
-module riscv_top (
-	input clk_i
+module riscv_top #(
+	parameter WORD_SIZE = 32
+) (
+	input clk_i,
+	input rst_ni
 );
 	
-riscv_core core(
 
-);
+	logic PC;
+	riscv_core core(
+		.clk_i,
+		.rst_ni,
+		.PC_q_o
+	);
 
-mem inst_mem(
+	mem inst_mem(
 
-);
+	);
 
-mem data_mem(
-	
-);
+	mem data_mem(
+		
+	);
 
 endmodule
