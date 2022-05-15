@@ -14,7 +14,7 @@ module riscv_top #(
 		.PC_q_o
 	);
 
-	mem instr_mem (
+	async_mem instr_mem (
 		.clk_i,
 		.we_i(1'b0),
 		.write_data_i('0),

@@ -1,20 +1,23 @@
 module riscv_EX #(
+	parameter REGFILE_COUNT = 32,
 	parameter WORD_SIZE = 32
 ) (
-	input					clk_i,
-	input					rst_ni,
+	input								clk_i,
+	input								rst_ni,
 
 	//from  ID stage
-	input	[WORD_SIZE-1:0]	PC_EX_i,
-	input	[WORD_SIZE-1:0]	read_data0_i,
-	input	[WORD_SIZE-1:0]	read_data1_i,
-	input	[WORD_SIZE-1:0]	imm,
-
+	input	[WORD_SIZE-1:0]				PC_EX_i,
+	input	[WORD_SIZE-1:0]				read_data0_i,
+	input	[WORD_SIZE-1:0]				read_data1_i,
+	input	[WORD_SIZE-1:0]				imm_i,
+	input	[$clog2(REGFILE_COUNT)-1:0] write_reg_i,
+	input	[3:0]						alu_ctrl_i,
 	//to MEM stage
-	output					alu_zero_o,
-	output	[WORD_SIZE-1:0]	alu_out_o,
-	output	[WORD_SIZE-1:0]	read_data1_o,
-	output	[WORD_SIZE-1:0]	jp_addr_o
+	output								alu_zero_o,
+	output	[WORD_SIZE-1:0]				alu_out_o,
+	output	[WORD_SIZE-1:0]				read_data1_o,
+	output	[WORD_SIZE-1:0]				jp_addr_o,
+	input	[$clog2(REGFILE_COUNT)-1:0] write_reg_o,
 );
 
 	logic [WORD_SIZE-1:0]	alu_in_2;
@@ -37,11 +40,13 @@ module riscv_EX #(
 			alu_out_o <= '0;
 			read_data1_o <= '0;
 			jp_addr_o <= '0;
+			write_reg_o <= '0;
 		end else begin
 			alu_zero_o <= alu_zero;
 			alu_out_o <= alu_out;
 			read_data1_o <= read_data1_i;
 			jp_addr_o <= PC_EX_i + imm;
+			write_reg_o <= write_reg_i;
 		end
 	end
 
