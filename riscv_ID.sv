@@ -4,22 +4,22 @@ module riscv_ID #(
 ) (
 	input					clk_i,
 	input					rst_ni,
-
-	input	[XLEN-1:0]	PC_ID_i,
-	input	[XLEN-1:0]	instr_ID_i,
+	//from IF stage
+	input	[XLEN-1:0]		PC_ID_i,
+	input	[XLEN-1:0]		instr_ID_i,
 
 	//reg file
 	//writeback signals sent directly from WB stage
 	output	[$clog2(REGFILE_COUNT)-1:0]	rs1_o,
 	output	[$clog2(REGFILE_COUNT)-1:0]	rs2_o,
-	input	[XLEN-1:0]				rs1_data_i,
-	input	[XLEN-1:0]				rs2_data_i,
+	input	[XLEN-1:0]					rs1_data_i,
+	input	[XLEN-1:0]					rs2_data_i,
 
 	//to EX stage
-	output	[XLEN-1:0]				PC_ID_o,
-	output	[XLEN-1:0]				extended_imm_o,
-	output	[XLEN-1:0]				rs1_data_o,
-	output	[XLEN-1:0]				rs2_data_o,
+	output	[XLEN-1:0]					PC_ID_o,
+	output	[XLEN-1:0]					extended_imm_o,
+	output	[XLEN-1:0]					rs1_data_o,
+	output	[XLEN-1:0]					rs2_data_o,
 	output	[$clog2(REGFILE_COUNT)-1:0]	rd_o,
 	output								alu_src_o,
 	output								mem_to_reg_o,
@@ -39,6 +39,7 @@ module riscv_ID #(
 	logic			mem_write;
 	logic			branch;
 	logic	[1:0]	alu_op;
+	logic	[31:0]	imm;
 	
 	always_ff @ (posedge clk_i or negedge rst_ni) begin
 		if(!rst_ni) begin
@@ -57,7 +58,7 @@ module riscv_ID #(
 			alu_op_o <= '0;
 		end else begin
 			PC_ID_o <= PC_ID_i;
-			extended_imm_o <= {{20{instr_ID_i[31]}},instr_ID_i[31:20]};
+			extended_imm_o <= imm;
 			rs1_data_o <= rs1_data_i;
 			rs2_data_o <= rs2_data_i;
 			rd_o <= rd;
@@ -75,7 +76,7 @@ module riscv_ID #(
 	end
 
 	always_comb begin
-		//R instr format for now TODO
+		imm = {{20{instr_ID_i[31]}},instr_ID_i[31:20]};
 		funct7 = instr_ID_i[31:25];
 		rs2_o = instr_ID_i[24:20];
 		rs1_o = instr_ID_i[19:15];

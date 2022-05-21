@@ -1,4 +1,5 @@
-//simple dual port word-aligned memory
+//simple memory
+// async read
 module mem #(
 	parameter XLEN = 32,
 	parameter DEPTH = 32

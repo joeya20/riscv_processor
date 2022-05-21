@@ -47,14 +47,7 @@ module control_unit (
 				branch_o = 1'b1;
 				alu_op_o = 2'b01;
 			end
-			default: begin	//TODO
-				alu_src_o = 1'bx;
-				mem_to_reg_o = 1'bx;
-				reg_write_o = 1'bx;
-				mem_read_o = 1'bx;
-				mem_write_o = 1'bx;
-				branch_o = 1'bx;
-				alu_op_o = 2'bxx;
+			default: ;
 			end
 		end
 	end

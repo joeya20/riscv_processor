@@ -2,21 +2,21 @@ module riscv_core #(
 	parameter REGFILE_COUNT = 32,
 	parameter XLEN = 32
 ) (
-	input								clk_i,
-	input 								rst_ni,
+	input	clk_i,
+	input 	rst_ni,
 
 	//instruction memory
-	output	[XLEN-1:0]				PC_q_o,
-	input	[XLEN-1:0]				instr_IF_i,
+	output	[XLEN-1:0]	PC_q_o,
+	input	[XLEN-1:0]	instr_IF_i,
 
 	//reg file
 	output								regfile_we_o,
 	output	[$clog2(REGFILE_COUNT)-1:0]	rs1_o,
 	output	[$clog2(REGFILE_COUNT)-1:0]	rs2_o,
 	output	[$clog2(REGFILE_COUNT)-1:0]	rd_o,
-	input	[XLEN-1:0]				rs1_data_i,
-	input	[XLEN-1:0]				rs2_data_i,
-	output	[XLEN-1:0]				rd_data_o,
+	input	[XLEN-1:0]					rs1_data_i,
+	input	[XLEN-1:0]					rs2_data_i,
+	output	[XLEN-1:0]					rd_data_o,
 
 	//data memory
 
@@ -29,24 +29,24 @@ module riscv_core #(
 	//IF stage
 	logic [XLEN-1:0]	instr;
 	logic [XLEN-1:0]	branch_addr;
-	logic					take_branch;
+	logic				take_branch;
 
 	//ID stage
 	logic [XLEN-1:0]	extended_imm_ID;
 	logic [XLEN-1:0]	rs1_data;
 	logic [XLEN-1:0]	rs2_data;
-	logic [6:0]	funct7;
-	logic [2:0]	funct3;
+	logic [6:0]			funct7;
+	logic [2:0]			funct3;
 
 	//EX stage	
-	logic 					alu_zero;
+	logic 				alu_zero;
 	logic [XLEN-1:0]	alu_out_EX;
 	logic [XLEN-1:0]	rs2_data_EX;
 	logic [XLEN-1:0]	branch_addr_EX;
 
 	//MEM stage
 	logic [XLEN-1:0]	alu_out_MEM;
-	logic 					reg_write_MEM;
+	logic 				reg_write_MEM;
 
 
 	//write reg# signals
