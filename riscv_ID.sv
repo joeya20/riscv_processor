@@ -1,82 +1,86 @@
 module riscv_ID #(
 	parameter REGFILE_COUNT = 32,
-	parameter WORD_SIZE = 32
+	parameter XLEN = 32
 ) (
 	input					clk_i,
 	input					rst_ni,
 
-	input	[WORD_SIZE-1:0]	PC_ID_i,
-	input	[WORD_SIZE-1:0]	instr_ID_i,
+	input	[XLEN-1:0]	PC_ID_i,
+	input	[XLEN-1:0]	instr_ID_i,
 
 	//reg file
 	//writeback signals sent directly from WB stage
-	output	[$clog2(REGFILE_COUNT)-1:0]	read_reg0_o,
-	output	[$clog2(REGFILE_COUNT)-1:0]	read_reg1_o,
-	input	[WORD_SIZE-1:0]				read_data0_i,
-	input	[WORD_SIZE-1:0]				read_data1_i,
+	output	[$clog2(REGFILE_COUNT)-1:0]	rs1_o,
+	output	[$clog2(REGFILE_COUNT)-1:0]	rs2_o,
+	input	[XLEN-1:0]				rs1_data_i,
+	input	[XLEN-1:0]				rs2_data_i,
 
 	//to EX stage
-	output	[WORD_SIZE-1:0]				PC_ID_o,
-	output	[WORD_SIZE-1:0]				extended_imm_o,
-	output	[WORD_SIZE-1:0]				read_data0_o,
-	output	[WORD_SIZE-1:0]				read_data1_o,
-	output	[$clog2(REGFILE_COUNT)-1:0]	write_reg_o,
-	output	[3:0]						alu_ctrl_o,
-	output								ALU_src_o,
+	output	[XLEN-1:0]				PC_ID_o,
+	output	[XLEN-1:0]				extended_imm_o,
+	output	[XLEN-1:0]				rs1_data_o,
+	output	[XLEN-1:0]				rs2_data_o,
+	output	[$clog2(REGFILE_COUNT)-1:0]	rd_o,
+	output								alu_src_o,
 	output								mem_to_reg_o,
 	output								reg_write_o,
 	output								mem_read_o,
 	output								mem_write_o,
 	output								branch_o,
-	output	[1:0]						ALU_op_o
+	output	[1:0]						alu_op_o,
+	output	[2:0]						funct3_o,
+	output	[6:0]						funct7_o
 );
 
-	logic			ALU_src;
+	logic			alu_src;
 	logic			mem_to_reg;
 	logic			reg_write;
 	logic			mem_read;
 	logic			mem_write;
 	logic			branch;
-	logic	[1:0]	ALU_op;
+	logic	[1:0]	alu_op;
 	
 	always_ff @ (posedge clk_i or negedge rst_ni) begin
 		if(!rst_ni) begin
 			PC_ID_o <= '0;
-			extended_imm <= '0;
-			read_data0_o <= '0;
-			read_data1_o <= '0;
-			write_reg_o <= '0;
-			alu_ctrl_o <= '0;
-			ALU_src_o <= '0;
+			extended_imm_o <= '0;
+			rs1_data_o <= '0;
+			rs2_data_o <= '0;
+			rd_o <= '0;
+			//ctrl signals
+			alu_src_o <= '0;
 			mem_to_reg_o <= '0;
 			reg_write_o <= '0;
 			mem_read_o <= '0;
 			mem_write_o <= '0;
 			branch_o <= '0;
-			ALU_op_o <= '0;
+			alu_op_o <= '0;
 		end else begin
 			PC_ID_o <= PC_ID_i;
-			extended_imm <= {{20{instr_ID_i[31]}},instr_ID_i[31:20]};
-			read_data0_o <= read_data0_i;
-			read_data1_o <= read_data1_i;
-			write_reg_o <= write_reg;
-			alu_ctrl_o <= {instr_ID_i[30], instr_ID_i[14:12]};
-			ALU_src_o <= ALU_src;
+			extended_imm_o <= {{20{instr_ID_i[31]}},instr_ID_i[31:20]};
+			rs1_data_o <= rs1_data_i;
+			rs2_data_o <= rs2_data_i;
+			rd_o <= rd;
+			//ctrl signals
+			alu_src_o <= alu_src;
 			mem_to_reg_o <= mem_to_reg;
 			reg_write_o <= reg_write;
 			mem_read_o <= mem_read;
 			mem_write_o <= mem_write;
 			branch_o <= branch;
-			ALU_op_o <= ALU_op;
+			alu_op_o <= alu_op;
+			funct3_o <= funct3;
+			funct7_o <= funct7;
 		end
 	end
 
 	always_comb begin
+		//R instr format for now TODO
 		funct7 = instr_ID_i[31:25];
-		read_reg1_o = instr_ID_i[24:20];
-		read_reg0_o = instr_ID_i[19:15];
+		rs2_o = instr_ID_i[24:20];
+		rs1_o = instr_ID_i[19:15];
 		funct3 = instr_ID_i[14:12];
-		write_reg = instr_ID_i[11:7];
+		rd = instr_ID_i[11:7];
 		opcode = instr_ID_i[6:0];
 	end
 
@@ -85,9 +89,9 @@ module riscv_ID #(
 		.branch_o(branch),
 		.mem_read_o(mem_read),
 		.mem_to_reg_o(mem_to_reg),
-		.ALU_op_o(ALU_op),
+		.alu_op_o(alu_op),
 		.mem_write_o(mem_write),
-		.ALU_src_o(ALU_src),
+		.alu_src_o(alu_src),
 		.reg_write_o(reg_write)
 	);
 
